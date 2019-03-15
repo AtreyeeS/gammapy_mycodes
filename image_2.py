@@ -13,7 +13,6 @@ from gammapy.detect import KernelBackgroundEstimator as KBE
 
 #choose the obsevartion
 name="PKS 2155-304"
-name="Crab"
 datastore = DataStore.from_dir("$HESS_DATA") 
 src=SkyCoord.from_name(name)
 sep=SkyCoord.separation(src,datastore.obs_table.pointing_radec)

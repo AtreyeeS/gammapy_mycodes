@@ -7,12 +7,14 @@ from astropy.visualization import simple_norm
 
 from gammapy.data import DataStore
 from gammapy.image import SkyImage
-from gammapy.scripts import SingleObsImageMaker
 from gammapy.utils.energy import Energy
 import regions
 
 import scipy.stats as ss
 import copy
+
+from scaling_compare import *
+
 #get the observations
 name="PKS 2155-304"
 #name="Mkn 421"
@@ -40,13 +42,15 @@ energy_band = Energy([0.5, 1.0], 'TeV')
 offset_band = Angle([0.0, 1.5], 'deg')
 backnorm=[]
 Ncounts=[]
-list_zen=filter(lambda o1: o1.pointing_zen.value<20.0, mylist)
+list_zen=filter(lambda o1: o1.pointing_zen.value<34.3, mylist)
 N=len(list_zen)
-print N
+#print N
+
+N=1
 
 for i in range(N):
-    if i%10 ==0:
-        print "----running observation -- ",i
+#    if i%10 ==0:
+#        print "----running observation -- ",i
     
     obs=list_zen[i]
 
@@ -65,7 +69,7 @@ for i in range(N):
         empty_image=ref_image,
         energy_band=energy_band,
         offset_band=offset_band,
-        exclusion_mask=exclusion_mask_tevcat,
+        exclusion_mask=mask1,
     )
 
     image_maker.counts_image()
@@ -84,9 +88,12 @@ for i in range(N):
     backnorm.append(image_maker.table_bkg_scale['bkg_scale'].data[0])
     Ncounts.append(image_maker.table_bkg_scale['N_counts'].data[0])
    
-   
+ 
 print "exited from loop...now plot..." 
 
+print Ncounts, backnorm
+
+"""
 plt.hist(backnorm)
 plt.title("Energy band: "+str(energy_band))
 plt.ylabel("frequency of occurance")
@@ -115,16 +122,16 @@ muonef=[o1.muoneff for o1 in list_zen]
 
 bkg_counts = np.divide(Ncounts,backnorm)
 
-plt.plot(zen_ang,np.divide(Ncounts,time),"r.",label="Observed")
-plt.plot(zen_ang,np.divide(bkg_counts,time),"b.",label="Model predicted")
+plt.plot(zen_ang[:-1],np.divide(Ncounts,time[:-1]),"r.",label="Observed")
+plt.plot(zen_ang[:-1],np.divide(bkg_counts,time[:-1]),"b.",label="Model predicted")
 plt.xlabel("Zenith angle")
 plt.ylabel("Count rate [/s]")
 plt.title("Energy band: "+str(energy_band))
 plt.legend()
 plt.show()
 
-plt.plot(muonef,np.divide(Ncounts,time),"r.",label="Observed")
-plt.plot(muonef,np.divide(bkg_counts,time),"b.",label="Model predicted")
+plt.plot(muonef[:-1],np.divide(Ncounts,time[:-1]),"r.",label="Observed")
+plt.plot(muonef[:-1],np.divide(bkg_counts,time[:-1]),"b.",label="Model predicted")
 plt.xlabel("Muon effectivity")
 plt.ylabel("Count rate [/s]")
 plt.title("Energy band: "+str(energy_band))
@@ -132,4 +139,4 @@ plt.legend()
 plt.show()
 
 dev = np.absolute(np.subtract(1.0,backnorm))
-
+"""

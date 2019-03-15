@@ -35,9 +35,8 @@ name="Crab"
 datastore = DataStore.from_dir("$HESS_DATA") 
 src=SkyCoord.from_name(name)
 sep=SkyCoord.separation(src,datastore.obs_table.pointing_radec)
-srcruns=(datastore.obs_table[sep<2.0*u.deg]) 
+srcruns=(datastore.obs_table[sep<2.0*u.deg]) #2 deg because of HESS field of view.. choose accordingly 
 obsid=srcruns['OBS_ID'].data
-mylist=datastore.obs_list((obsid[0],))
 
 # Define obs parameters
 lo_threshold = 0.1 * u.TeV
@@ -51,6 +50,7 @@ model = PowerLaw(index=index, amplitude=amplitude, reference=reference)
 
 # for one obs only
 
+mylist=datastore.obs_list((obsid[0],))
 n_obs=1
 seeds = np.arange(n_obs)
 sim = SimulationRealBkg(source_model=model, obsrun=mylist[0], obspos=src)
@@ -67,7 +67,7 @@ print fit.result[0]
 
 #now run in a loop
 
-n_obs=20
+n_obs=200
 mylist=datastore.obs_list(obsid[0:n_obs])
 seeds = np.arange(n_obs)
 sims=[]
